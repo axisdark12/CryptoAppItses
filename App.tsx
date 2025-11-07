@@ -4,7 +4,7 @@ import axios from 'axios';
 import Header from './src/components/Header'
 import Formulario from './src/components/Formulario';
 import Cotizacion from './src/components/Cotizacion';
-
+import GraficoHistorico from './src/components/GraficoHistorico'; // <--- 1. Importar el nuevo componente
 
 const App  = () => {
 
@@ -13,6 +13,8 @@ const App  = () => {
   const [ consultarAPI, guardarConsultarAPI ] = useState(false);
   const [ resultado, guardarResultado] = useState({});
   const [ cargando, guardarCargando] = useState(false);
+  const [ mostrarGrafico, setMostrarGrafico ] = useState(false);
+  const [ criptomonedasList, setCriptomonedasList ] = useState<any[]>([]); // Se usará en pasos posteriores
 
   useEffect(() => {
     const cotizarCriptomoneda = async () => {
@@ -35,6 +37,8 @@ const App  = () => {
     }
     cotizarCriptomoneda();
   }, [consultarAPI]);
+  const handleOpenChart = () => setMostrarGrafico(true);
+  const handleCloseChart = () => setMostrarGrafico(false);
 
   // mostrar el spinner o el resultado
   const componente = cargando ? <ActivityIndicator size="large" color="#5E49E2" /> : <Cotizacion  resultado={resultado} />
@@ -42,7 +46,7 @@ const App  = () => {
   return (
     <>
     <ScrollView>
-        <Header />
+        <Header onOpenChart={handleOpenChart} />
 
         <Image
           style={styles.imagen}
@@ -63,6 +67,13 @@ const App  = () => {
         </View>
    
       </ScrollView>
+      
+      {/* AGREGAR EL COMPONENTE GRÁFICO (Modal) */}
+      <GraficoHistorico 
+        isVisible={mostrarGrafico}
+        onClose={handleCloseChart}
+        criptomonedas={criptomonedasList} 
+      />
     </>
   );
 };
