@@ -44,7 +44,7 @@ const App = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Botón flotante para abrir el modal del gráfico */}
+   
       <BotonGrafica />
 
       <ScrollView>

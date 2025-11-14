@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { Modal, TouchableOpacity, View, StyleSheet, Text } from 'react-native';
 // @ts-ignore: no declaration file for react-native-vector-icons/MaterialCommunityIcons
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import GraficoBitcoin from './GraficoBitcoin';
@@ -13,8 +13,7 @@ const BotonGrafica = () => {
         style={styles.boton}
         onPress={() => setModalVisible(true)}
       >
-        {/* Ícono de gráfico ascendente */}
-        <Icon name="chart-line" size={28} color="#FFF" />
+        <Text>📊</Text>
       </TouchableOpacity>
 
       <Modal
@@ -31,7 +30,7 @@ const BotonGrafica = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 30,
+    top: 800,
     right: 20,
     zIndex: 10,
   },
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#5E49E2',
+    backgroundColor: '#03775cff',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,

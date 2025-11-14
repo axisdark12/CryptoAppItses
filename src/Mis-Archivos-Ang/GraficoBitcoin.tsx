@@ -3,28 +3,50 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Scroll
 import axios from 'axios';
 import { LineChart } from 'react-native-chart-kit';
 
+const TASA_USD_MXN = 20;
+
 const GraficoBitcoin = ({ cerrarModal }: any) => {
   const [historial, setHistorial] = useState<number[]>([]);
-  const [fechas, setFechas] = useState<string[]>([]);
+  const [fechas, setFechas] = useState<{ diaMostrado: string; mesMostrado: string }[]>([]);
   const [precioReferencia, setPrecioReferencia] = useState('');
   const [precioY, setPrecioY] = useState<number | null>(null);
 
   useEffect(() => {
     const obtenerHistorial = async () => {
       try {
-        const url = 'https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30';
+        const url =
+          'https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=8';
+
         const { data } = await axios.get(url);
-        const precios = data.Data.Data.map((d: any) => d.close);
-        const labels = data.Data.Data.map((d: any) => {
+
+        const preciosUSD = data.Data.Data.map((d: any) => d.close);
+
+        // Fechas separadas en día y mes
+        const fechasProcesadas = data.Data.Data.map((d: any) => {
           const date = new Date(d.time * 1000);
-          return `${date.getDate()}/${date.getMonth() + 1}`;
+
+          return {
+            diaMostrado: String(date.getDate()),
+            mesMostrado: date.toLocaleString('es-MX', { month: 'short' }), // ej "nov"
+          };
         });
-        setHistorial(precios);
-        setFechas(labels);
+
+        // Convertir precios a MXN
+        const preciosMXN = preciosUSD.map((p: number) => p * TASA_USD_MXN);
+
+        // Formato elegante MXN
+        const preciosFormateados = preciosMXN.map((p: number) =>
+          Math.round(p)
+        );
+
+        setHistorial(preciosFormateados.slice(-15));
+        setFechas(fechasProcesadas.slice(-15));
+
       } catch (error) {
         console.log('Error al obtener historial:', error);
       }
     };
+
     obtenerHistorial();
   }, []);
 
@@ -39,22 +61,29 @@ const GraficoBitcoin = ({ cerrarModal }: any) => {
     <ScrollView style={styles.container}>
       <Text style={styles.titulo}>Bitcoin</Text>
 
+      {/* Mes mostrado debajo */}
+      {fechas.length > 0 && (
+        <Text style={styles.mesTexto}>
+          Mes: {fechas[0].mesMostrado.toUpperCase()}
+        </Text>
+      )}
+
       {historial.length > 0 && (
         <LineChart
           data={{
-            labels: fechas,
+            labels: fechas.map((f) => f.diaMostrado),
             datasets: [
               {
                 data: historial,
-                color: () => '#5E49E2',
+                color: () => '#03775cff',
                 strokeWidth: 2,
               },
               ...(precioY
                 ? [
                     {
                       data: Array(historial.length).fill(precioY),
-                      color: () => 'red',
-                      strokeWidth: 1.5,
+                      color: () => 'blue',
+                      strokeWidth: 2,
                     },
                   ]
                 : []),
@@ -63,21 +92,30 @@ const GraficoBitcoin = ({ cerrarModal }: any) => {
           width={screenWidth}
           height={260}
           chartConfig={{
-            backgroundColor: '#FFF',
-            backgroundGradientFrom: '#FFF',
-            backgroundGradientTo: '#FFF',
-            decimalPlaces: 2,
+            backgroundColor: '#fff',
+            backgroundGradientFrom: '#ccd2d7e6',
+            backgroundGradientTo: '#cdd2d7e6',
+            decimalPlaces: 0,
+
             color: (opacity = 1) => `rgba(94, 73, 226, ${opacity})`,
+
             labelColor: () => '#000',
-            propsForDots: { r: '3', strokeWidth: '1', stroke: '#5E49E2' },
+
+            propsForDots: {
+              r: '3',
+              strokeWidth: '1',
+              stroke: '#d3e8d6ff',
+            },
           }}
           bezier
           style={styles.grafica}
         />
       )}
 
+      {/* Input referencia */}
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Precio de referencia:</Text>
+        <Text style={styles.label}>Precio de referencia (MXN):</Text>
+
         <TextInput
           placeholder="Ej. 150000"
           keyboardType="numeric"
@@ -85,6 +123,7 @@ const GraficoBitcoin = ({ cerrarModal }: any) => {
           value={precioReferencia}
           onChangeText={setPrecioReferencia}
         />
+
         <TouchableOpacity style={styles.boton} onPress={marcarPrecio}>
           <Text style={styles.botonTexto}>Marcar línea</Text>
         </TouchableOpacity>
@@ -101,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: '#fff',
   },
   titulo: {
     fontSize: 22,
@@ -109,6 +148,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Lato-Black',
     color: '#5E49E2',
     marginVertical: 10,
+  },
+  mesTexto: {
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 5,
+    fontFamily: 'Lato-Regular',
   },
   grafica: {
     marginVertical: 15,
@@ -132,7 +178,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   boton: {
-    backgroundColor: '#5E49E2',
+    backgroundColor: '#161326ff',
     padding: 10,
     borderRadius: 8,
   },
@@ -141,7 +187,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Lato-Black',
   },
   botonCerrar: {
-    backgroundColor: '#444',
+    backgroundColor: '#971717ff',
     padding: 10,
     borderRadius: 8,
     marginTop: 20,
