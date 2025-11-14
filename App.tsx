@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { StyleSheet, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import Header from './src/components/Header'
 import Formulario from './src/components/Formulario';
 import Estadisticas from './src/components/Estadisticas';
 import { getCryptoStats } from './src/api/cryptoService';
@@ -226,7 +223,6 @@ const App = () => {
           source={require('./assets/img/cryptomonedas.png')}
         />
 
->>>>>>> main
         <View style={styles.contenido}>
           <Formulario
             moneda={moneda}
@@ -234,15 +230,6 @@ const App = () => {
             guardarMoneda={guardarMoneda}
             guardarCriptomoneda={guardarCriptomoneda}
             guardarConsultarAPI={guardarConsultarAPI}
-<<<<<<< HEAD
-          />
-        </View>
-        <View>
-          {cargando && <ActivityIndicator size="large" color="#5E49E2" />}
-          {!cargando && resultado && <Estadisticas stats={resultado} history={historial} />}
-        </View>
-
-=======
             guardarAlerta={setAlerta}
           />
         </View>
@@ -250,22 +237,18 @@ const App = () => {
         <View style={{ marginTop: 40 }}>
           {componente}
         </View>
->>>>>>> main
+
       </ScrollView>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
-  contenedor:{
-    backgroundColor: '#4d4c4cff'
-=======
   imagen: {
     width: '100%',
     height: 150,
     marginHorizontal: '2.5%',
->>>>>>> main
+
   },
   contenido: {
     marginHorizontal: '2.5%',
