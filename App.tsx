@@ -69,12 +69,6 @@ const App = () => {
         </View>
         <View style={{ marginTop: 40 }}>{componente}</View>
 
-        <View style={styles.contenido}>
-          <Simulador />
-        </View>
-
-         <View style={{ height: 50 }} /> 
-
       </ScrollView>
     </>
   );
