@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-const Cotizacion = ({resultado}:any) => {
+const Cotizacion = ({ resultado }: any) => {
 
-    if(Object.keys(resultado).length === 0 ) return null;
+    if (Object.keys(resultado).length === 0) return null;
 
-    return ( 
+    return (
         <View style={styles.resultado}>
             <Text style={[styles.texto, styles.precio]}>
                 <Text style={styles.span}>{resultado.PRICE} </Text>
@@ -23,7 +23,7 @@ const Cotizacion = ({resultado}:any) => {
                 <Text style={styles.span}> {resultado.LASTUPDATE} </Text>
             </Text>
         </View>
-     );
+    );
 }
 
 const styles = StyleSheet.create({
@@ -44,5 +44,5 @@ const styles = StyleSheet.create({
         fontFamily: 'Lato-Black',
     }
 })
- 
+
 export default Cotizacion;
