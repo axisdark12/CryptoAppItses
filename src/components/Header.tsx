@@ -2,11 +2,11 @@ import React from 'react';
 import { Text, StyleSheet, Platform, TouchableOpacity, View } from 'react-native';
 
 const Header = () => (
-    <Text style={styles.encabezado}>Criptomonedas</Text>
+    <Text style={styles.encabezados}>Criptomonedas</Text>
 );
 
 const styles = StyleSheet.create({
-    encabezado: {
+    encabezados: {
         paddingTop: Platform.OS === 'ios' ? 60 : 10, 
         fontFamily: 'Lato-Black',
         backgroundColor: '#2d2660ff',
