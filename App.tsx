@@ -1,59 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { StyleSheet, Image, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import Formulario from './src/components/Formulario';
 import Estadisticas from './src/components/Estadisticas';
-import { getCryptoStats } from './src/api/cryptoService';
-import { getCryptoHistory } from './src/api/getCryptoHistory';
-import type { CryptoStats } from './src/Types/CryptoStats';
-import type { HistoricalData } from './src/Types/CryptoStats';
-
-const App = () => {
-  const [moneda, guardarMoneda] = useState('');
-  const [criptomoneda, guardarCriptomoneda] = useState('');
-  const [consultarAPI, guardarConsultarAPI] = useState(false);
-  const [resultado, guardarResultado] = useState<CryptoStats | null>(null);
-  const [cargando, guardarCargando] = useState(false);
-  const [historial, guardarHistorial] = useState<HistoricalData[] | null>(null);
-
-  useEffect(() => {
-    const obtenerEstadisticas = async () => {
-      if (consultarAPI) {
-        try {
-          // consultar la api 
-          // const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
-          const resultado = await getCryptoStats(criptomoneda, moneda);
-          const historial = await getCryptoHistory(criptomoneda, moneda);
-          // const data = resultado.data.RAW[criptomoneda][moneda];
-          // console.log("Datos de la API en App.tsx: ", resultado);
-          guardarResultado(resultado);
-          guardarHistorial(historial);
-        } catch (error) {
-          Alert.alert(
-            'Error',
-            'No se puden obtener las estadísticas. Favor de intentar más tarde',
-            [{ text: 'Ok' }]
-          )
-        } finally {
-          guardarCargando(false);
-          guardarConsultarAPI(false);
-        }
-      }
-    }
-    obtenerEstadisticas();
-  }, [consultarAPI]);
-
-  return (
-    <>
-      <ScrollView style={styles.contenedor}>
-        <Header />
-
-import { StyleSheet, Image, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import axios from 'axios';
 import Header from './src/components/Header';
-import Formulario from './src/components/Formulario';
 import Cotizacion from './src/components/Cotizacion';
 import GraficoHistorico from './src/components/GraficoHistorico';
-import type {alertaPrecio} from '../CryptoAppItses/src/types/alertas'
-
+import Simulador from "./src/components/Simulador/Simulador";
+import { getCryptoStats } from './src/api/cryptoService';
+import { getCryptoHistory } from './src/api/getCryptoHistory';
+import axios from 'axios';
+import type { CryptoStats } from './src/Types/CryptoStats';
+import type { HistoricalData } from './src/Types/CryptoStats';
+import type { alertaPrecio } from './src/Types/alertas'
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 
@@ -70,17 +28,42 @@ const App = () => {
   const [moneda, guardarMoneda] = useState('');
   const [criptomoneda, guardarCriptomoneda] = useState('');
   const [consultarAPI, guardarConsultarAPI] = useState(false);
-  const [resultado, guardarResultado] = useState({});
+  const [resultado, guardarResultado] = useState<CryptoStats | null>(null);
   const [cargando, guardarCargando] = useState(false);
-
+  const [historial, guardarHistorial] = useState<HistoricalData[] | null>(null);
   const [alerta, setAlerta] = useState<alertaPrecio | null>(null);
-  
+  const [mostrarGrafico, setMostrarGrafico] = useState(false);
+  const [criptomonedasList, setCriptomonedasList] = useState<any[]>([]);
+
   const formatearNumero = (valor: number) => {
-    return new Intl.NumberFormat('es-Mx',{
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 4,
+    return new Intl.NumberFormat('es-Mx', {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 4,
     }).format(valor)
-  }
+  };
+
+  useEffect(() => {
+    const obtenerEstadisticas = async () => {
+      if (consultarAPI) {
+        try {
+          const resultado = await getCryptoStats(criptomoneda, moneda);
+          const historial = await getCryptoHistory(criptomoneda, moneda);
+          guardarResultado(resultado);
+          guardarHistorial(historial);
+        } catch (error) {
+          Alert.alert(
+            'Error',
+            'No se puden obtener las estadísticas. Favor de intentar más tarde',
+            [{ text: 'Ok' }]
+          )
+        } finally {
+          guardarCargando(false);
+          guardarConsultarAPI(false);
+        }
+      }
+    }
+    obtenerEstadisticas();
+  }, [consultarAPI]);
 
   useEffect(() => {
     const pedirPermisosNotificaciones = async () => {
@@ -108,27 +91,13 @@ const App = () => {
     pedirPermisosNotificaciones();
   }, []);
 
-import Simulador from "./src/components/Simulador/Simulador";
-
-
-  const [ moneda, guardarMoneda ] = useState('');
-  const [ criptomoneda, guardarCriptomoneda ] = useState('');
-  const [ consultarAPI, guardarConsultarAPI ] = useState(false);
-  const [ resultado, guardarResultado] = useState({});
-  const [ cargando, guardarCargando] = useState(false);
-  
-  // NUEVOS ESTADOS para el gráfico
-  const [ mostrarGrafico, setMostrarGrafico ] = useState(false);
-  const [ criptomonedasList, setCriptomonedasList ] = useState<any[]>([]);
-
-  const enviarNotificacionAlerta = async (alerta:alertaPrecio, precioActual:number) => {
+  const enviarNotificacionAlerta = async (alerta: alertaPrecio, precioActual: number) => {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Alerta de precio',
-          body: `${alerta.criptomoneda} ha ${
-            alerta.condicion === 'above' ? 'subido' : 'bajado'
-          } a ${formatearNumero(precioActual)} ${alerta.moneda}`,
+          body: `${alerta.criptomoneda} ha ${alerta.condicion === 'above' ? 'subido' : 'bajado'
+            } a ${formatearNumero(precioActual)} ${alerta.moneda}`,
           data: { tipo: 'alerta_precio' },
         },
         trigger: null,
@@ -189,23 +158,6 @@ import Simulador from "./src/components/Simulador/Simulador";
         const precioTexto = datos.PRICE;
         const numeroLimpio = precioTexto.replace(/[^0-9.-]+/g, '');
         const precioActual = parseFloat(numeroLimpio);
-
-  // Funciones para manejar el estado del modal
-  const handleOpenChart = () => setMostrarGrafico(true);
-  const handleCloseChart = () => setMostrarGrafico(false);
-
-
-  // mostrar el spinner o el resultado
-  const componente = cargando ? (
-    <ActivityIndicator size="large" color="#5E49E2" />
-  ) : (
-    <Cotizacion resultado={resultado} />
-  );
-
-  return (
-    <>
-    <ScrollView>
-        <Header onOpenChart={handleOpenChart} />
         if (isNaN(precioActual)) {
           console.log('No se pudo parsear el precio', precioTexto);
           return;
@@ -219,8 +171,7 @@ import Simulador from "./src/components/Simulador/Simulador";
           await enviarNotificacionAlerta(alerta, Number(precioActual.toFixed(2)));
           Alert.alert(
             'Alerta cumplida',
-            `${alerta.criptomoneda} ha ${
-              alerta.condicion === 'above' ? 'subido' : 'bajado'
+            `${alerta.criptomoneda} ha ${alerta.condicion === 'above' ? 'subido' : 'bajado'
             } al precio objetivo de ${formatearNumero(alerta.precioObjetivo)} ${alerta.moneda}`
           );
 
@@ -229,11 +180,16 @@ import Simulador from "./src/components/Simulador/Simulador";
       } catch (error) {
         console.log('Error comprobando alerta', error);
       }
-    }, 60000); 
+    }, 60000);
 
     return () => clearInterval(intervalo);
   }, [alerta]);
 
+  // Funciones para manejar el estado del modal
+  const handleOpenChart = () => setMostrarGrafico(true);
+  const handleCloseChart = () => setMostrarGrafico(false);
+
+  // mostrar el spinner o el resultado
   const componente = cargando ? (
     <ActivityIndicator size="large" color="#5E49E2" />
   ) : (
@@ -242,8 +198,9 @@ import Simulador from "./src/components/Simulador/Simulador";
 
   return (
     <>
-      <ScrollView>
-        <Header />
+      <ScrollView style={styles.contenedor}>
+        {/* <Header /> */}
+        <Header onOpenChart={handleOpenChart} />
 
         <Image
           style={styles.imagen}
@@ -251,14 +208,6 @@ import Simulador from "./src/components/Simulador/Simulador";
         />
 
         <View style={styles.contenido}>
-            <Formulario 
-              moneda={moneda}
-              criptomoneda={criptomoneda}
-              guardarMoneda={guardarMoneda}
-              guardarCriptomoneda={guardarCriptomoneda}
-              guardarConsultarAPI={guardarConsultarAPI}
-              setCriptomonedasList={setCriptomonedasList} 
-            />
           <Formulario
             moneda={moneda}
             criptomoneda={criptomoneda}
@@ -266,26 +215,32 @@ import Simulador from "./src/components/Simulador/Simulador";
             guardarCriptomoneda={guardarCriptomoneda}
             guardarConsultarAPI={guardarConsultarAPI}
             guardarAlerta={setAlerta}
+            setCriptomonedasList={setCriptomonedasList}
+
           />
         </View>
 
         <View style={{ marginTop: 40 }}>
-          {componente}
+          {/* {componente} */}
+          {cargando && <ActivityIndicator size="large" color="#5E49E2" />}
+          {!cargando && resultado && <Estadisticas stats={resultado} history={historial} />}
         </View>
 
+
+        <GraficoHistorico
+          isVisible={mostrarGrafico}
+          onClose={handleCloseChart}
+          criptomonedas={criptomonedasList}
+        />
       </ScrollView>
-      
-      <GraficoHistorico 
-        isVisible={mostrarGrafico}
-        onClose={handleCloseChart}
-        criptomonedas={criptomonedasList} 
-      />
     </>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  contenedor: {
+    backgroundColor: '#4d4c4cff'
+  },
   imagen: {
     width: "100%",
     height: 150,
