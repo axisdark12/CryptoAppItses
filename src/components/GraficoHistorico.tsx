@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Modal, ScrollView, Platform, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
-import { LineChart } from 'react-native-chart-kit'; 
+// Importamos los componentes de WAGMI Charts
+import { CandlestickChart } from 'react-native-wagmi-charts'; 
 
 // Tipado de datos
 interface CryptoData {
@@ -19,6 +20,14 @@ interface OHLCVPoint {
     low: number;
     open: number;
 }
+// Tipado de datos para WAGMI (requiere timestamp en milisegundos)
+interface WagmiCandle {
+    timestamp: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+}
 interface GraficoHistoricoProps {
     isVisible: boolean;
     onClose: () => void;
@@ -26,6 +35,7 @@ interface GraficoHistoricoProps {
 }
 
 const screenWidth = Dimensions.get("window").width;
+const CHART_HEIGHT = 250;
 
 const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoricoProps) => {
 
@@ -69,31 +79,21 @@ const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoric
         }
     }, [selectedCripto, isVisible]); 
 
-    // Función para procesar los datos para el LineChart (usando el precio de cierre)
-    const getChartData = () => {
-        if (historicalData.length === 0) {
-            return {
-                labels: [],
-                datasets: [{ data: [0] }],
-            };
-        }
-
-        const closes = historicalData.map(d => d.close);
-        // Etiquetas: Usamos la hora local para formatear el eje X 
-        const times = historicalData.map(d => new Date(d.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-        const labelsToShow = times.filter((_, index) => index % 4 === 0);
+    // Función para formatear los datos al formato requerido por WAGMI (timestamp en milisegundos)
+    const getWagmiChartData = (): WagmiCandle[] => {
+        if (historicalData.length === 0) return [];
         
-        return {
-            labels: labelsToShow,
-            datasets: [{
-                data: closes,
-                color: (opacity = 1) => `rgba(94, 73, 226, ${opacity})`, 
-                strokeWidth: 2 
-            }],
-        };
+        return historicalData.map((d) => ({
+            // Multiplicamos por 1000 para pasar de segundos a milisegundos
+            timestamp: d.time * 1000, 
+            open: d.open,
+            high: d.high,
+            low: d.low,
+            close: d.close,
+        }));
     };
 
-    const chartData = getChartData();
+    const wagmiChartData = getWagmiChartData();
     
     // Obtener los datos del último punto (el más reciente) para la vista OHLCV
     const lastDataPoint = historicalData.length > 0 ? historicalData[historicalData.length - 1] : null;
@@ -108,7 +108,7 @@ const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoric
         >
             <View style={styles.centeredView}>
                 <ScrollView>
-                    <Text style={styles.modalTitle}>📈 Histórico de Precios (24h)</Text>
+                    <Text style={styles.modalTitle}>🕯️ Gráfico de Velas WAGMI (24h)</Text>
                     
                     {/* Selector de Criptomoneda */}
                     <Text style={styles.label}>SELECCIONAR CRIPTOMONEDA (VS USD)</Text>
@@ -135,27 +135,17 @@ const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoric
                         {loading ? (
                             <ActivityIndicator size="large" color="#5E49E2" style={{ marginTop: 100, marginBottom: 100 }} />
                         ) : (
-                             historicalData.length > 0 ? (
-                                <View>
-                                    <Text style={styles.chartTitle}>Precio de Cierre por Hora</Text>
+                             wagmiChartData.length > 0 ? (
+                                <View style={{ width: screenWidth * 0.9, height: CHART_HEIGHT }}>
+                                    <Text style={styles.chartTitle}>Gráfico de Velas Horarias</Text>
                                     
-                                    <LineChart
-                                        data={chartData}
-                                        width={screenWidth * 0.9} 
-                                        height={220}
-                                        chartConfig={{
-                                            backgroundColor: '#ffffff',
-                                            backgroundGradientFrom: '#ffffff',
-                                            backgroundGradientTo: '#ffffff',
-                                            decimalPlaces: 2, 
-                                            color: (opacity = 1) => `rgba(94, 73, 226, ${opacity})`, 
-                                            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                            style: { borderRadius: 16 },
-                                            propsForDots: { r: "3", strokeWidth: "1", stroke: "#5E49E2" }
-                                        }}
-                                        bezier 
-                                        style={{ marginVertical: 8, borderRadius: 16 }}
-                                    />
+                                    {/* Implementación del Gráfico de Velas de WAGMI */}
+                                    <CandlestickChart.Provider data={wagmiChartData}>
+                                        <CandlestickChart height={CHART_HEIGHT}>
+                                            <CandlestickChart.Candles />
+                                        </CandlestickChart>
+                                        {/* No implementamos ejes ni cursores interactivos para mantener la simplicidad */}
+                                    </CandlestickChart.Provider>
                                     
                                     {/* Vista de Detalles OHLCV */}
                                     {lastDataPoint && (
@@ -176,7 +166,7 @@ const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoric
                                         </View>
                                     )}
 
-                                    <Text style={styles.infoText}>Granularidad: Horaria (Muestra Precio de Cierre OHLCV)</Text>
+                                    <Text style={styles.infoText}>Granularidad: Horaria (WAGMI Charts)</Text>
                                 </View>
                             ) : (
                                 <Text style={styles.noDataText}>Seleccione una criptomoneda para cargar el historial, o no hay datos disponibles.</Text>
@@ -198,6 +188,7 @@ const GraficoHistorico = ({ isVisible, onClose, criptomonedas }: GraficoHistoric
 };
 
 const styles = StyleSheet.create({
+    // ... (Styles se mantienen igual)
     centeredView: {
         flex: 1,
         paddingTop: Platform.OS === 'ios' ? 60 : 20,
@@ -278,7 +269,6 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         textAlign: 'center'
     },
-    // Nuevos estilos para la vista OHLCV
     ohlcvContainer: {
         marginTop: 15,
         padding: 10,
