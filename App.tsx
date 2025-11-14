@@ -46,7 +46,6 @@ const App = () => {
       <ScrollView style={styles.contenedor}>
         <Header />
 
-=======
 import { StyleSheet, Image, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
 import Header from './src/components/Header';
@@ -109,6 +108,7 @@ const App = () => {
     pedirPermisosNotificaciones();
   }, []);
 
+import Simulador from "./src/components/Simulador/Simulador";
 
 
   const [ moneda, guardarMoneda ] = useState('');
@@ -196,7 +196,11 @@ const App = () => {
 
 
   // mostrar el spinner o el resultado
-  const componente = cargando ? <ActivityIndicator size="large" color="#5E49E2" /> : <Cotizacion  resultado={resultado} />
+  const componente = cargando ? (
+    <ActivityIndicator size="large" color="#5E49E2" />
+  ) : (
+    <Cotizacion resultado={resultado} />
+  );
 
   return (
     <>
@@ -283,7 +287,7 @@ const App = () => {
 
 const styles = StyleSheet.create({
   imagen: {
-    width: '100%',
+    width: "100%",
     height: 150,
     marginHorizontal: '2.5%',
 
