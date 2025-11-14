@@ -11,7 +11,7 @@ import Header from "./src/components/Header";
 import Formulario from "./src/components/Formulario";
 import Cotizacion from "./src/components/Cotizacion";
 
-import Simulador from "./src/components/Simulador";
+import Simulador from "./src/components/Simulador/Simulador";
 
 const App = () => {
   const [moneda, guardarMoneda] = useState("");
