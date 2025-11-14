@@ -1,67 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, View, ScrollView, ActivityIndicator } from 'react-native';
-import axios from 'axios';
-import Header from './src/components/Header'
-import Formulario from './src/components/Formulario';
-import Cotizacion from './src/components/Cotizacion';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Image,
+  View,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import axios from "axios";
+import Header from "./src/components/Header";
+import Formulario from "./src/components/Formulario";
+import Cotizacion from "./src/components/Cotizacion";
 
+import Simulador from "./src/components/Simulador";
 
-const App  = () => {
-
-  const [ moneda, guardarMoneda ] = useState('');
-  const [ criptomoneda, guardarCriptomoneda ] = useState('');
-  const [ consultarAPI, guardarConsultarAPI ] = useState(false);
-  const [ resultado, guardarResultado] = useState({});
-  const [ cargando, guardarCargando] = useState(false);
+const App = () => {
+  const [moneda, guardarMoneda] = useState("");
+  const [criptomoneda, guardarCriptomoneda] = useState("");
+  const [consultarAPI, guardarConsultarAPI] = useState(false);
+  const [resultado, guardarResultado] = useState({});
+  const [cargando, guardarCargando] = useState(false);
 
   useEffect(() => {
     const cotizarCriptomoneda = async () => {
-      if(consultarAPI) {
-          // consultar la api para obtener la cotización
-          const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
-          const resultado = await axios.get(url);
+      if (consultarAPI) {
+        // consultar la api para obtener la cotizacion
+        const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
+        const resultado = await axios.get(url);
 
-          // console.log(resultado.data.DISPLAY[criptomoneda][moneda] );
-          guardarCargando(true);
+        // console.log(resultado.data.DISPLAY[criptomoneda][moneda] );
+        guardarCargando(true);
 
-          // Ocultar el spinner y mostrar el resultado
-          setTimeout(() => {
-              guardarResultado(resultado.data.DISPLAY[criptomoneda][moneda] );
-              guardarConsultarAPI(false);
-              guardarCargando(false);
-              
-          }, 3000);
+        // Ocultar el spinner y mostrar el resultado
+        setTimeout(() => {
+          guardarResultado(resultado.data.DISPLAY[criptomoneda][moneda]);
+          guardarConsultarAPI(false);
+          guardarCargando(false);
+        }, 3000);
       }
-    }
+    };
     cotizarCriptomoneda();
   }, [consultarAPI]);
 
   // mostrar el spinner o el resultado
-  const componente = cargando ? <ActivityIndicator size="large" color="#5E49E2" /> : <Cotizacion  resultado={resultado} />
+  const componente = cargando ? (
+    <ActivityIndicator size="large" color="#5E49E2" />
+  ) : (
+    <Cotizacion resultado={resultado} />
+  );
 
   return (
     <>
-    <ScrollView>
+      <ScrollView>
         <Header />
 
         <Image
           style={styles.imagen}
-          source={ require('./assets/img/cryptomonedas.png') }
+          source={require("./assets/img/cryptomonedas.png")}
         />
 
         <View style={styles.contenido}>
-            <Formulario 
-              moneda={moneda}
-              criptomoneda={criptomoneda}
-              guardarMoneda={guardarMoneda}
-              guardarCriptomoneda={guardarCriptomoneda}
-              guardarConsultarAPI={guardarConsultarAPI}
-            />
+          <Formulario
+            moneda={moneda}
+            criptomoneda={criptomoneda}
+            guardarMoneda={guardarMoneda}
+            guardarCriptomoneda={guardarCriptomoneda}
+            guardarConsultarAPI={guardarConsultarAPI}
+          />
         </View>
-        <View style={{ marginTop: 40 }}>
-          {componente}
+        <View style={{ marginTop: 40 }}>{componente}</View>
+
+        <View style={styles.contenido}>
+          <Simulador />
         </View>
-   
+
+         <View style={{ height: 50 }} /> 
+
       </ScrollView>
     </>
   );
@@ -69,13 +82,13 @@ const App  = () => {
 
 const styles = StyleSheet.create({
   imagen: {
-    width: '100%',
+    width: "100%",
     height: 150,
-    marginHorizontal: '2.5%'
+    marginHorizontal: "2.5%",
   },
   contenido: {
-    marginHorizontal: '2.5%'
-  }
+    marginHorizontal: "2.5%",
+  },
 });
 
 export default App;
