@@ -52,6 +52,7 @@ import axios from 'axios';
 import Header from './src/components/Header';
 import Formulario from './src/components/Formulario';
 import Cotizacion from './src/components/Cotizacion';
+import GraficoHistorico from './src/components/GraficoHistorico';
 import type {alertaPrecio} from '../CryptoAppItses/src/types/alertas'
 
 import * as Notifications from 'expo-notifications';
@@ -109,6 +110,16 @@ const App = () => {
   }, []);
 
 
+
+  const [ moneda, guardarMoneda ] = useState('');
+  const [ criptomoneda, guardarCriptomoneda ] = useState('');
+  const [ consultarAPI, guardarConsultarAPI ] = useState(false);
+  const [ resultado, guardarResultado] = useState({});
+  const [ cargando, guardarCargando] = useState(false);
+  
+  // NUEVOS ESTADOS para el gráfico
+  const [ mostrarGrafico, setMostrarGrafico ] = useState(false);
+  const [ criptomonedasList, setCriptomonedasList ] = useState<any[]>([]);
 
   const enviarNotificacionAlerta = async (alerta:alertaPrecio, precioActual:number) => {
     try {
@@ -179,6 +190,18 @@ const App = () => {
         const numeroLimpio = precioTexto.replace(/[^0-9.-]+/g, '');
         const precioActual = parseFloat(numeroLimpio);
 
+  // Funciones para manejar el estado del modal
+  const handleOpenChart = () => setMostrarGrafico(true);
+  const handleCloseChart = () => setMostrarGrafico(false);
+
+
+  // mostrar el spinner o el resultado
+  const componente = cargando ? <ActivityIndicator size="large" color="#5E49E2" /> : <Cotizacion  resultado={resultado} />
+
+  return (
+    <>
+    <ScrollView>
+        <Header onOpenChart={handleOpenChart} />
         if (isNaN(precioActual)) {
           console.log('No se pudo parsear el precio', precioTexto);
           return;
@@ -224,6 +247,14 @@ const App = () => {
         />
 
         <View style={styles.contenido}>
+            <Formulario 
+              moneda={moneda}
+              criptomoneda={criptomoneda}
+              guardarMoneda={guardarMoneda}
+              guardarCriptomoneda={guardarCriptomoneda}
+              guardarConsultarAPI={guardarConsultarAPI}
+              setCriptomonedasList={setCriptomonedasList} 
+            />
           <Formulario
             moneda={moneda}
             criptomoneda={criptomoneda}
@@ -239,6 +270,13 @@ const App = () => {
         </View>
 
       </ScrollView>
+      
+      <GraficoHistorico 
+        isVisible={mostrarGrafico}
+        onClose={handleCloseChart}
+        criptomonedas={criptomonedasList} 
+      />
+    </>
     </View>
   );
 };
