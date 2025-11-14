@@ -8,6 +8,7 @@ interface HeaderProps {
 const Header = ({ onOpenChart }: HeaderProps) => (
     <View style={styles.headerContainer}>
         <Text style={styles.encabezado}>Criptomonedas</Text>
+        
         <TouchableOpacity
             style={styles.btnGrafico}
             onPress={onOpenChart}
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 50 : 10,
         backgroundColor: '#5E49E2',
         paddingBottom: 10,
-        marginBottom: 30, 
+        marginBottom: 30,
         flexDirection: 'column',
         alignItems: 'center',
     },
@@ -34,7 +35,6 @@ const styles = StyleSheet.create({
         color: '#FFF',
         paddingHorizontal: 10,
     },
-    // Nuevos estilos para el botón
     btnGrafico: {
         backgroundColor: '#4032a3', 
         paddingVertical: 5,

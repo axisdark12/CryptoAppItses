@@ -3,7 +3,16 @@ import { Text, View, StyleSheet, TouchableHighlight, Alert } from 'react-native'
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 
-const Formulario = ({ moneda, criptomoneda, guardarMoneda, guardarCriptomoneda, guardarConsultarAPI}:any) => {
+interface FormularioProps {
+    moneda: any;
+    criptomoneda: any;
+    guardarMoneda: (moneda: string) => void;
+    guardarCriptomoneda: (cripto: string) => void;
+    guardarConsultarAPI: (value: boolean) => void;
+    setCriptomonedasList?: (list: any[]) => void;
+}
+
+const Formulario = ({ moneda, criptomoneda, guardarMoneda, guardarCriptomoneda, guardarConsultarAPI, setCriptomonedasList }: FormularioProps) => {
 
 
     const [ criptomonedas, guardarCriptomonedas ] = useState([]);
@@ -12,7 +21,13 @@ const Formulario = ({ moneda, criptomoneda, guardarMoneda, guardarCriptomoneda, 
         const consultarAPI = async () => {
             const url = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD';
             const resultado = await axios.get(url);
+            
             guardarCriptomonedas(resultado.data.Data);
+
+            // Compartir la lista con App.tsx
+            if (setCriptomonedasList) { 
+                setCriptomonedasList(resultado.data.Data);
+            }
         }
         consultarAPI();
     }, []);
