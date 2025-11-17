@@ -1,17 +1,32 @@
 import React from 'react';
 import { Text, StyleSheet, Platform, TouchableOpacity, View } from 'react-native';
 
-const Header = () => (
-    <Text style={styles.encabezados}>Criptomonedas</Text>
-);
+// Definición simple de Props (minimo tipado)
+interface HeaderProps {
+    onOpenChart: () => void;
+}
+
+
+const Header = ({ onOpenChart }: HeaderProps) => (
+    <View style={styles.headerContainer}>
+        <Text style={styles.encabezado}>Criptomonedas</Text>
+        <TouchableOpacity
+            style={styles.btnGrafico}
+            onPress={onOpenChart}
+        >
+            <Text style={styles.textBtnGrafico}>📈 Histórico</Text>
+        </TouchableOpacity>
+    </View>
+ );
 
 const styles = StyleSheet.create({
-    encabezados: {
-        paddingTop: Platform.OS === 'ios' ? 60 : 10, 
-        fontFamily: 'Lato-Black',
-        backgroundColor: '#2d2660ff',
+    headerContainer: {
+        // Aseguramos que el contenedor tenga el mismo fondo y padding
+        paddingTop: Platform.OS === 'ios' ? 50 : 10,
+        backgroundColor: '#5E49E2',
         paddingBottom: 10,
-        marginBottom: 30,
+        marginBottom: 30, // Mantiene el espaciado original
+        // Añadimos Flexbox para alinear título y botón
         flexDirection: 'column',
         alignItems: 'center',
     },
@@ -24,11 +39,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     btnGrafico: {
-        backgroundColor: '#4032a3', 
+        backgroundColor: '#4032a3', // Un color similar pero diferente al fondo
         paddingVertical: 5,
         paddingHorizontal: 15,
         borderRadius: 5,
-        marginTop: 5, 
+        marginTop: 5, // Espacio entre el título y el botón
     },
     textBtnGrafico: {
         color: '#FFF',
@@ -36,5 +51,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
     }
 })
-
+ 
 export default Header;
