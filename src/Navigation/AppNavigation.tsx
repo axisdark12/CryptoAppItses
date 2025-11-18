@@ -5,9 +5,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import HomeScreen from '../screens/HomeScreen';
 import EstadisticasScreen from '../screens/EstadisticasScreen';
-import GraficoBitcoinScreen from '../screens/GraficoBitcoinScreen';
 import GraficoHistoricoScreen from '../screens/GraficoHistoricoScreen';
-import SimuladorScreen from '../screens/SimuladorScreen';
+import GraficoBitcoin from '../Mis-Archivos-Ang/GraficoBitcoin';
+import Simulador from '../components/Simulador/Simulador';
 
 const Tab = createBottomTabNavigator();
 
@@ -74,7 +74,6 @@ export default function AppNavigation() {
                 <Tab.Screen
                     name="Home"
                     component={HomeScreen}
-                    options={{ title: 'Home' }}
                 />
                 <Tab.Screen
                     name="Estadísticas"
@@ -86,11 +85,11 @@ export default function AppNavigation() {
                 />
                 <Tab.Screen
                     name="Simulador"
-                    component={SimuladorScreen}
+                    component={Simulador}
                 />
                 <Tab.Screen
                     name="Gráficas"
-                    component={GraficoBitcoinScreen}
+                    component={GraficoBitcoin}
                 />
 
             </Tab.Navigator>

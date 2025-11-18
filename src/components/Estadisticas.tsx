@@ -3,8 +3,18 @@ import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import type { CardProps } from '../Types/CryptoStats';
 
 export default function Estadisticas({ stats, history }: CardProps) {
-    const { imageUrl, price, changePct24h, changePctDay, changePctHour, high24h,
-        low24h, volume24h, marketCap, supply, circulatingSupply, } = stats;
+    const { 
+        imageUrl, 
+        price, 
+        changePct24h, 
+        changePctDay, 
+        changePctHour, 
+        high24h,
+        low24h, 
+        volume24h, 
+        marketCap, 
+        supply, 
+        circulatingSupply } = stats;
 
     const formatearNumero = (valor: number, decimales = 2) =>
         valor?.toLocaleString("es-MX", {

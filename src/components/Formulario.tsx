@@ -103,8 +103,7 @@ const Formulario = ({
 
     Alert.alert(
       'Alerta creada',
-      `Te avisaremos cuando ${criptomoneda} ${
-        condicion === 'above' ? 'suba a' : 'baje a'
+      `Te avisaremos cuando ${criptomoneda} ${condicion === 'above' ? 'suba a' : 'baje a'
       } ${formatearNumero(precioNumero)} ${moneda}`
     );
   };
@@ -116,71 +115,79 @@ const Formulario = ({
     <View style={styles.container}>
       <Text style={styles.titulo}>Selecciona tu moneda y criptomoneda</Text>
 
-      {/* Selección MONEDA */}
-      <Text style={styles.label}>Moneda</Text>
-      <Picker
-        selectedValue={moneda}
-        onValueChange={guardarMoneda}
-        style={styles.picker}
-        itemStyle={{ height: 120 }}
-      >
-        <Picker.Item label="-" value="" />
-        <Picker.Item label="Dólar (USD)" value="USD" />
-        <Picker.Item label="Peso (MXN)" value="MXN" />
-        <Picker.Item label="Euro (EUR)" value="EUR" />
-        <Picker.Item label="Libra (GBP)" value="GBP" />
-      </Picker>
+      <View style={styles.row}>
+        <View style={styles.col}>
+          {/* Selección MONEDA */}
+          <Text style={styles.label}>Moneda</Text>
+          <Picker
+            selectedValue={moneda}
+            onValueChange={guardarMoneda}
+            style={styles.picker}
+            itemStyle={{ height: 120 }}
+          >
+            <Picker.Item label="-" value="" />
+            <Picker.Item label="Dólar (USD)" value="USD" />
+            <Picker.Item label="Peso (MXN)" value="MXN" />
+            <Picker.Item label="Euro (EUR)" value="EUR" />
+            <Picker.Item label="Libra (GBP)" value="GBP" />
+          </Picker>
+        </View>
+        <View style={styles.col}>
+          {/* Selección CRIPTO */}
+          <Text style={styles.label}>Criptomoneda</Text>
+          <Picker
+            selectedValue={criptomoneda}
+            onValueChange={guardarCriptomoneda}
+            style={styles.picker}
+            itemStyle={{ height: 120 }}
+          >
+            <Picker.Item label="-" value="" />
+            {criptomonedas.map((cripto: any) => (
+              <Picker.Item
+                key={cripto.CoinInfo?.Id}
+                label={cripto.CoinInfo?.FullName}
+                value={cripto.CoinInfo?.Name}
+              />
+            ))}
+          </Picker>
+        </View>
+      </View>
 
-      {/* Selección CRIPTO */}
-      <Text style={styles.label}>Criptomoneda</Text>
-      <Picker
-        selectedValue={criptomoneda}
-        onValueChange={guardarCriptomoneda}
-        style={styles.picker}
-        itemStyle={{ height: 120 }}
-      >
-        <Picker.Item label="-" value="" />
-        {criptomonedas.map((cripto: any) => (
-          <Picker.Item
-            key={cripto.CoinInfo?.Id}
-            label={cripto.CoinInfo?.FullName}
-            value={cripto.CoinInfo?.Name}
-          />
-        ))}
-      </Picker>
+      <View style={styles.alertBox}>
+        {/* ALERTA DE PRECIO */}
+        <Text style={styles.label}>Alerta de precio</Text>
 
-      {/* ALERTA DE PRECIO */}
-      <Text style={styles.label}>Alerta de precio</Text>
+        <Text style={styles.label2}>Precio objetivo</Text>
+        <TextInput
+          keyboardType="numeric"
+          placeholder="Ej. 1500"
+          placeholderTextColor="#888"
+          value={precioObjetivo}
+          onChangeText={setPrecioObjetivo}
+          style={styles.input}
+        />
 
-      <Text style={styles.label2}>Precio objetivo</Text>
-      <TextInput
-        keyboardType="numeric"
-        placeholder="Ej. 1500"
-        placeholderTextColor="#888"
-        value={precioObjetivo}
-        onChangeText={setPrecioObjetivo}
-        style={styles.input}
-      />
+        <Text style={styles.label2}>Condición</Text>
+        <Picker
+          selectedValue={condicion}
+          onValueChange={valor => setCondicion(valor)}
+          style={styles.picker}
+          itemStyle={{ height: 120 }}
+        >
+          <Picker.Item label="Cuando SUBA a ese precio" value="above" />
+          <Picker.Item label="Cuando BAJE a ese precio" value="below" />
+        </Picker>
 
-      <Text style={styles.label2}>Condición</Text>
-      <Picker
-        selectedValue={condicion}
-        onValueChange={valor => setCondicion(valor)}
-        style={styles.picker}
-        itemStyle={{ height: 120 }}
-      >
-        <Picker.Item label="Cuando SUBA a ese precio" value="above" />
-        <Picker.Item label="Cuando BAJE a ese precio" value="below" />
-      </Picker>
+        {/* Botón crear alerta */}
+        <TouchableHighlight style={styles.btnAlerta} onPress={crearAlerta}>
+          <Text style={styles.textoBoton}>Crear alerta</Text>
+        </TouchableHighlight>
+      </View>
 
-      {/* Botón crear alerta */}
-      <TouchableHighlight style={styles.btnAlerta} onPress={crearAlerta}>
-        <Text style={styles.textoBoton}>Crear alerta</Text>
-      </TouchableHighlight>
 
       {/* Botón cotizar */}
       <TouchableHighlight style={styles.btnCotizar} onPress={cotizarPrecio}>
-        <Text style={styles.textoBoton}>Ver estadísticas</Text>
+        <Text style={styles.textoBoton}>Guardar</Text>
       </TouchableHighlight>
     </View>
   );
@@ -204,7 +211,7 @@ const styles = StyleSheet.create({
   },
   titulo: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10
@@ -253,6 +260,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     textTransform: 'uppercase'
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10
+  },
+  col: {
+    flex: 1
+  },
+  alertBox: {
+    marginTop: 20,
+    padding: 14,
+    backgroundColor: '#262626',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#393939'
   }
 });
 
